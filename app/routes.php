@@ -55,6 +55,48 @@ return function (App $app) {
         return $renderer->render($response, "home.php");
     });
 
+    $app->get('/admin', function (Request $request, Response $response) {
+        $renderer = $this->get('renderer');
+        $log = $this->get('logger');
+        $log->notice("Admin Access");
+        return $renderer->render($response, "admin/adminMain.php");
+    });
+
+    $app->get('/admin/check', function (Request $request, Response $response) {
+        $renderer = $this->get('renderer');
+        $log = $this->get('logger');
+        $log->notice("Admin Access");
+        $sampleData = array
+        (
+            array("88189fb275", 8.3, 123213231, "12:30"),
+            array("811859a750", 7.3, 123213213, "12:31"),
+            array("4710284e30", 4.9, 213213213, "12:40"),
+            array("8c321522c8", 5.6, 123123213, "13:50")
+        );
+
+        $data = array();
+        $data['transactions'] = $sampleData;
+        return $renderer->render($response, "admin/checkTable.php", $data);
+    });
+
+    $app->get('/admin/verifyTransactions', function (Request $request, Response $response) {
+        $renderer = $this->get('renderer');
+        $log = $this->get('logger');
+        $log->notice("Admin Access");
+        $sampleData = array
+        (
+            array("88189fb275", 8.3, 123213231, "12:30"),
+            array("811859a750", 7.3, 123213213, "12:31"),
+            array("4710284e30", 4.9, 213213213, "12:40"),
+            array("8c321522c8", 5.6, 123123213, "13:50")
+        );
+
+        $data = array();
+        $data['transactions'] = $sampleData;
+        return $renderer->render($response, "admin/verifyTransaction.php", $data);
+    });
+
+
     $app->get('/pay/{tid}', function (Request $request, Response $response, $args) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');

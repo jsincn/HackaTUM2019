@@ -16,44 +16,31 @@
 
 
         <form>
-            <h2 class="text-center">Canteen Payment</h2>
-            <h4>Previous transactions</h4>
+            <h2 class="text-center">Canteen Payment Administration</h2>
+            <h4>Verify a given meal</h4>
+            
             <div class="form-group mb-2">
-                <label for="staticEmail2">StudentID</label>
-                <input type="text" class="form-control" name="id" placeholder="12345678">
+                <label for="staticEmail2">Meal ID</label>
+                <input type="text" class="form-control" name="id" placeholder="506010">
             </div>
-            <button type="submit" class="btn btn-primary">Check transactions</button>
+            <button type="submit" class="btn btn-primary">Verify</button>
             <br>
             <br>
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">Date</th>
+                        <th scope="col"></th>
                         <th scope="col">Amount</th>
-                        <th scope="col">Place</th>
+                        <th scope="col">Student ID</th>
+                        <th scope="col">Time</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($data['transactions'] as $item) {
-                        echo "<tr><th scope='row'>" . $item[0] . "</th><td>" . $item[1] . "€</td><td>" . $item[2] . "</td></tr>";
+                        echo "<tr><th scope='row'>" . $item[0] . "</th><td>" . $item[1] . "€</td><td>" . $item[2] . "</td><td>" . $item[3] . "</td></tr>";
                     };
                     ?>
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th scope="col">Total</th>
-                        
-                        <th scope="col">€<?php echo $data['total'] ?></th>
-                        <th scope="col"></th>
-                    </tr>
-                    <tr>
-                        
-                        <th scope="col">Remaining Balance</th>
-                        
-                        <th scope="col">€<?php echo $data['total'] ?></th>
-                        <th></th>
-                    </tr>
-                </tfoot>
             </table>
         </form>
 
