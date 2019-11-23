@@ -12,14 +12,12 @@ before_script:
 - composer require php-coveralls/php-coveralls:^2.1.0
 - composer install -n
 
-env:
-  global:
-  - 'SFTP_USER=hackatum2019-jakob\$hackatum2019-jakob'
-  - 'SFTP_PASSWORD=LoZLcxx7MsY3Mu8mWmPLd8WWnJB2iA29tSril8r5fFFiyfgmCoolAJPki4zN'
-after_success:
-- curl --ftp-create-dirs
-       -T filename
-       sftp://${SFTP_USER}:${SFTP_PASSWORD}@waws-prod-am2-281.ftp.azurewebsites.windows.net/site/wwwroot
+deploy:
+  provider: azure_web_apps
+  username: "jsteimle"
+  password: "5Pb14%lVAzMU714$iOKi"
+  site: "hackatum2019-jakob"
+  skip_cleanup: true
 
 script:
 - if [[ "$ANALYSIS" == 'true' ]]; then vendor/bin/phpunit --coverage-clover clover.xml ; fi
