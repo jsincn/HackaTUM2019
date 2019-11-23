@@ -15,8 +15,7 @@ deploy:
   provider: azure_web_apps
   username: "jsteimle"
   password: "5Pb14%lVAzMU714$iOKi"
-  site: "hackatum2019-jakob.scm.azurewebsites.net"
-  skip_cleanup: true
+  site: "hackatum2019-jakob.azurewebsites.net"
 
 script:
 - if [[ "$ANALYSIS" == 'true' ]]; then vendor/bin/phpunit --coverage-clover clover.xml ; fi
