@@ -26,6 +26,7 @@
             </div>
         </div>
     </nav>
+
     <div class="contact-clean">
 
             <h2 class="text-center">Canteen Payment</h2>
@@ -47,10 +48,22 @@
             <p class="copyright">Jakob Steimle © 2019</p>
         </footer>
     </div>
+
+    <form hidden method="post" action="/payConfirm" id="form">
+        <?php foreach ($data['recognized'] as $key => $quantity) {
+            echo "<input type='text' name='" . $key . "' value='" . $quantity . "'>";
+        };
+        echo "<input type='text' name='id' value='" . $data['user'] . "'>";
+        ?>
+    </form>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-
+    <script>
+        $(document).ready(function() {
+            $('#form').submit();
+        })
+    </script>
 </body>
 
 </html>
