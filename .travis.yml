@@ -12,10 +12,13 @@ before_script:
 - composer install -n
 
 deploy:
-  provider: azure_web_apps
-  username: "jsteimle"
-  password: "5Pb14%lVAzMU714$iOKi"
-  site: "hackatum2019-jakob.azurewebsites.net"
+  provider: script
+  script: bash deploy.sh
+
+env:
+  global:
+  - secure: g5DZ4Px8/Es0rXft0ClB3CUqovW4bQdEpX5QnWSyoTrbjlf2mYlNqqJjmY8tZLs6bv3oOznKs6XB1GTcKl0RR2tbH2T13uIOXA+qaUFawKQb0hwxGPv5Ffbin0SsdTAYDxsaXPgEopSLiiZOJJEUbbMCgEbaiLFcn4SQ1mi2wrtF3XMstCNUN8PWANEUAYvIs1gK2tXfKQ65huLiDSkpGGLavvoJSjA6qBmvNfFfD7M6N+QGMtdKtQdv+mkVGPy6nm2CaadYmID6LTnXGgL5rx4sJFvINwX5d5y2C1QjaUAwIk3Y5zO4OVvDGUXDYTO1SOGZ1eaM4EimxGjQv2N0fVW6LUmtm8+UNfHNWWGcWWVZcQD4wwgzMSEF+94VHCbNkwd0gPUDT2LrE+rGn+hPnCJtus4p1nkUB8aGwEBaQd5m25Y+A+C4EUIYupWCXha6up1WnS8toAsK/NNDXEd+jF2SXlZzbA8cLvxjpMVw0jbP2LJOy+/rrNUkwNuXydgx/mvRA5ZbA0SoDFMNTMTES1NUKTwQrmZlsKCIcpK34zPLGWf0jM+aTKEDNXbi8zAGLmWlYF+8++DNeLHUytROtF5+aItpZt4DeoiZxpbEr/5Vn00O9U79v/9fU+Gl1ksSAhERQEjqSt9l8BZkSjjGeGOgUaxzPyRzAUj++KbCdOs=
+  - secure: dpLECQyFJU5Mc3QxXbUedz8ydnIggdCcINd42c99h/kk6651sU1rh3cLQQ4newrrOEgW5A/Ox5aJKT+DMMS2wcjmuk3fvgeYFeX2ipgEXkUSBXpQPiiQZiSGCbEX1AbeLytzkgcgRJ3Yo6/lmpf33/V/tbMOc8YPmWzrclmDSksZB3CO0gnDmVaZBIS9rH+OBrW62LCLRC7JApDMqnES6//Me5rcFrRSS4+ltPZ6yQmegZBpf8hmlKLv3TgprXZknMOLkfZ9tVXax4ARfXjFqlj7xsUbbYrlIcL9Wuh+/3mpDOya7I1gLeT0WEKk9Zfyq2cJbjILH7Rz6ITyMBelZPUofVSYj/+J8xmeArZ2MpXcRVyb467E9U2CLaN46Z3NXyvJ8u63dQlLdlZ0yTUUiBd2w73vdxeVgsJ7uWBSsN5PXsoL83/Aq++RORYGc2g97fAMFP5/8uGxq7Y7KelcNavvDZnIv7Tf01XP0dwaOp0L7Fl2PhZUTAhtymNP1R6EtXJEp5WX0SxbMuSfH4WdtfWqC+DZOcAdQf2T1CMAbmBSsgC/FM4yS5jGAmnthAVVvZhgm9wFz897h/lAvc402kHFkb9V6Hdz9NugmGbU4AI+v8sbpllabTBT974g+92VDwoB8ICXwLmbCdcVz4cfd6pSrOOt/JWeR0CFAZQcFvg=
 
 script:
 - if [[ "$ANALYSIS" == 'true' ]]; then vendor/bin/phpunit --coverage-clover clover.xml ; fi
