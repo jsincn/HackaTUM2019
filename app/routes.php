@@ -76,6 +76,31 @@ return function (App $app) {
         return $renderer->render($response, "paymentGateway.php");
     });
 
+
+    $app->get('/payConfirm', function (Request $request, Response $response, $args) {
+        $renderer = $this->get('renderer');
+        $log = $this->get('logger');
+        $log->notice("Running payment confirmation");
+        $sampleData = array
+        (
+        array("Fries", 1, 1.7),
+        array("Coca Cola Classic 0.5L", 1, 1.3),
+        array("Deposit", 1, 0.25),
+        array("Currywurst", 1, 3.5)
+        );
+
+        $data = array();
+        $data['soldItems'] = $sampleData;
+        $data['studentName'] = "Robert Smith";
+        $data['total'] = 0;
+        foreach ($data['soldItems'] as $item) {
+            $data['total'] += $item[1] * $item[2];
+        }
+        
+
+        return $renderer->render($response, "paymentConfirmation.php", $data);
+    });
+
 };
 
 
