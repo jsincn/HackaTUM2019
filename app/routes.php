@@ -99,7 +99,7 @@ return function (App $app) {
         array("Fries", 1, 1.7),
         array("Coca Cola Classic 0.5L", 1, 1.3),
         array("Deposit", 1, 0.25),
-        array("Currywurst", 1, 3.5)
+        array("Gulasch", 1, 3.5)
         );
 
         $data = array();
