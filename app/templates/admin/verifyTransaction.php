@@ -21,18 +21,18 @@
             
             <div class="form-group mb-2">
                 <label for="staticEmail2">Meal ID</label>
-                <input type="text" class="form-control" name="id" placeholder="506010">
+                <input type="text" class="form-control" name="meal_id" placeholder="506010">
             </div>
             <button type="submit" class="btn btn-primary">Verify</button>
             <br>
             <br>
-            <table class="table">
+            <table class="table" style="display:block; overflow-x : scroll;">
                 <thead>
                     <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Student ID</th>
-                        <th scope="col">Time</th>
+                        <th scope="col">TID</th>
+                        <th scope="col">Preis</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Menge</th>
                     </tr>
                 </thead>
                 <tbody>

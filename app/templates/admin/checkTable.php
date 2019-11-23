@@ -15,18 +15,18 @@
     <div class="contact-clean" style="align:center">
 
 
-        <form>
+        <form action="/admin/check" action="GET">
             <h2 class="text-center">Canteen Payment Administration</h2>
             <h4>Check Tables</h4>
             <h4><small>Check all transactions for a given table in the last hour.</small></h4>
             <div class="form-group mb-2">
                 <label for="staticEmail2">Table ID</label>
-                <input type="text" class="form-control" name="id" placeholder="506010">
+                <input type="text" class="form-control" name="table_id" placeholder="506010">
             </div>
             <button type="submit" class="btn btn-primary">Check transactions</button>
             <br>
             <br>
-            <table class="table">
+            <table class="table" style="display:block; overflow-x : scroll;">
                 <thead>
                     <tr>
                         <th scope="col">Meal ID</th>
@@ -37,7 +37,7 @@
                 </thead>
                 <tbody>
                     <?php foreach ($data['transactions'] as $item) {
-                        echo "<tr><th scope='row'>" . $item[0] . "</th><td>" . $item[1] . "€</td><td>" . $item[2] . "</td><td>" . $item[3] . "</td></tr>";
+                        echo "<tr><th scope='row'>" . $item[0] . "</th><td>" . $item[4] . "€</td><td>" . $item[1] . "</td><td>" . $item[2]->format('Y-m-d H:i:s') . "</td></tr>";
                     };
                     ?>
                 </tbody>

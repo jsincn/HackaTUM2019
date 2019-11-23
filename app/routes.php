@@ -13,6 +13,7 @@ use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 
+
 function moveUploadedFile($directory, $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
@@ -28,6 +29,17 @@ function moveUploadedFile($directory, $uploadedFile)
 return function (App $app) {
 
     $container = $app->getContainer();
+
+    $container->set(
+        'db', function() {
+            
+        // SQL Server Extension Sample Code:
+        $connectionInfo = array("UID" => "jsteimle", "pwd" => '5Pb14%lVAzMU714$iOKi', "Database" => "cantine", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
+        $serverName = "tcp:hackatum2019-jakob.database.windows.net,1433";
+        $conn = sqlsrv_connect($serverName, $connectionInfo);
+            return $conn;
+        }
+    );
 
     $container->set(
         'logger', function() {
@@ -62,37 +74,78 @@ return function (App $app) {
         return $renderer->render($response, "admin/adminMain.php");
     });
 
-    $app->get('/admin/check', function (Request $request, Response $response) {
+    $app->get('/admin/check[/{table_id}]', function (Request $request, Response $response, $args) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Admin Access");
-        $sampleData = array
-        (
-            array("88189fb275", 8.3, 123213231, "12:30"),
-            array("811859a750", 7.3, 123213213, "12:31"),
-            array("4710284e30", 4.9, 213213213, "12:40"),
-            array("8c321522c8", 5.6, 123123213, "13:50")
-        );
-
+        
         $data = array();
-        $data['transactions'] = $sampleData;
+        $data['transactions'] = array();
+        if (isset($args['table_id']) || isset($_GET['table_id'])) {
+            $db = $this->get('db');
+            if (isset($_GET['table_id'])) {
+                $table_id = $_GET['table_id'];
+            } else {
+                $table_id =$args['table_id'];
+            }
+            $getResults=sqlsrv_query($db, "SELECT * FROM meal m WHERE table_id=" . $table_id . " AND  year(timestamp) = year(CURRENT_TIMESTAMP) and month(timestamp) = month(CURRENT_TIMESTAMP) and day(timestamp) = day(CURRENT_TIMESTAMP) ORDER BY timestamp DESC;");
+            
+            if ($getResults == false) {
+                echo(sqlsrv_errors());
+            }
+            $productCount = 0;  
+            while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
+                $log->notice(1, $row);
+                $data['transactions'][$productCount][0] = $row['meal_id'];
+                $data['transactions'][$productCount][1] = $row['card_id'];
+                $data['transactions'][$productCount][2] = $row['timestamp'];
+                $data['transactions'][$productCount][3] = $row['table_id'];
+                $data['transactions'][$productCount][4] = $row['total'];
+                echo("<br/>");  
+                $productCount++;  
+            }
+            sqlsrv_free_stmt($getResults);  
+            sqlsrv_close($db); 
+            
+        }
+        
         return $renderer->render($response, "admin/checkTable.php", $data);
     });
 
-    $app->get('/admin/verifyTransactions', function (Request $request, Response $response) {
+    $app->get('/admin/verifyTransactions[/{meal_id}]', function (Request $request, Response $response) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Admin Access");
-        $sampleData = array
-        (
-            array("88189fb275", 8.3, 123213231, "12:30"),
-            array("811859a750", 7.3, 123213213, "12:31"),
-            array("4710284e30", 4.9, 213213213, "12:40"),
-            array("8c321522c8", 5.6, 123123213, "13:50")
-        );
-
         $data = array();
-        $data['transactions'] = $sampleData;
+        $data['transactions'] = array();
+        if (isset($args['meal_id']) || isset($_GET['meal_id'])) {
+            $db = $this->get('db');
+            if (isset($_GET['meal_id'])) {
+                $meal_id = $_GET['meal_id'];
+            } else {
+                $meal_id = $args['meal_id'];
+            }
+            $getResults=sqlsrv_query($db, "SELECT m.meal_id, p.product_id, amount, price, pfand FROM meal m JOIN consists_of c ON (m.meal_id=c.meal_id) JOIN product p ON (c.product_id=p.product_id) WHERE m.meal_id=" . $meal_id . ";");
+            
+            if ($getResults == false) {
+                echo(sqlsrv_errors());
+            }
+            $productCount = 0;  
+            while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
+                $log->notice(2, $row);
+                $data['transactions'][$productCount][0] = $row['meal_id'];
+                $data['transactions'][$productCount][1] = $row['price'];
+                $data['transactions'][$productCount][2] = $row['product_id'];
+                $data['transactions'][$productCount][3] = $row['amount'];
+                
+                $productCount++;  
+            }
+            sqlsrv_free_stmt($getResults);  
+            sqlsrv_close($db); 
+            
+        }
+
+
         return $renderer->render($response, "admin/verifyTransaction.php", $data);
     });
 
