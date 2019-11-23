@@ -18,4 +18,3 @@ for prediction in results.predictions:
       else:
           Produkte[prediction.tag_name]=1
 
-print(Produkte)
