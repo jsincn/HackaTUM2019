@@ -52,7 +52,7 @@ return function (App $app) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Main Page");
-        return $renderer->render($response, "payment.php");
+        return $renderer->render($response, "home.php");
     });
 
     $app->get('/pay/{tid}', function (Request $request, Response $response, $args) {
@@ -84,18 +84,16 @@ return function (App $app) {
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
             $filename = moveUploadedFile($directory, $uploadedFile);
             $log->warning("File Uploaded " . $filename);
-            $command = 'python python/getImageData.py ' . $filename;
+            $command = 'python ' . __DIR__ . '/../python/getImageData.py ' . $filename;
             $log->notice($command);
             exec($command, $out, $status);
-            $anal = explode("|", $out[0]);
-            $barcode = $anal[1];
-            $products = $anal[0];
-            $log->notice($status, $out);
-            $log->notice($out[0]);
-            $data['recognized'] = json_decode($products, true);
-            $data['user'] = $barcode;
         }
-        
+        $objects = explode("|", $out[0]);
+        $log->notice($status, $out);
+        // $log->notice($out);
+        $data['recognized'] = json_decode($objects[0], true);
+        $data['user'] = $objects[1];
+        $log->notice($data['user']);
         $log->notice(1, $data['recognized']);
         $log->notice("Entering Payment Gateway");
         return $renderer->render($response, "paymentGateway.php", $data);
@@ -123,10 +121,11 @@ return function (App $app) {
         $data['soldItems'] = array();
         $i=0;
         foreach ($postVar as $key => $quantity) {
-            $data['soldItems'][$i] = array($key, $quantity, 10);
-            $i++;
+            if ($key != "id") {
+                $data['soldItems'][$i] = array($key, $quantity, 10);
+            }
         }
-        $data['studentName'] = "Robert Smith";
+        $data['studentName'] = $postVar['id'];
         $data['total'] = 0;
         foreach ($data['soldItems'] as $item) {
             $data['total'] += $item[1] * $item[2];

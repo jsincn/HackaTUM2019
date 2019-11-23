@@ -11,21 +11,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light navbar-expand-md navigation-clean-button">
-        <div class="container"><a class="navbar-brand" href="#">Canteen Pay</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse"
-                id="navcol-1">
-                <ul class="nav navbar-nav mr-auto">
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="#">About</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="#">My transactions</a></li>
-                    <li class="nav-item" role="presentation"><a class="nav-link" href="#">Admin</a></li>
-                    <li class="nav-item dropdown"><a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false" href="#">Help</a>
-                        <div class="dropdown-menu" role="menu"><a class="dropdown-item" role="presentation" href="#">FAQ</a><a class="dropdown-item" role="presentation" href="#">Email Support</a></div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php require "components/navbar.php"; ?>
     <div class="contact-clean">
         <form method="post" action="/paymentGateway"  enctype="multipart/form-data">
             <h2 class="text-center">Canteen Payment</h2>
@@ -39,26 +25,10 @@
             <div class="form-group"><button class="btn btn-primary" type="submit">PAY</button></div>
         </form>
     </div>
-    <div class="footer-basic">
-        <footer>
-            <div class="social"><a href="#"><i class="icon ion-social-instagram"></i></a><a href="#"><i class="icon ion-social-twitter"></i></a><a href="#"><i class="icon ion-social-facebook"></i></a></div>
-            <ul class="list-inline">
-                <li class="list-inline-item"><a href="#">Home</a></li>
-                <li class="list-inline-item"><a href="#">Services</a></li>
-                <li class="list-inline-item"><a href="#">About</a></li>
-                <li class="list-inline-item"><a href="#">Terms</a></li>
-                <li class="list-inline-item"><a href="#">Report Abuse</a></li>
-                <li class="list-inline-item"></li>
-            </ul>
-            <p class="copyright">Jakob Steimle © 2019</p>
-        </footer>
-    </div>
-    
+    <?php require "components/footer.php"; ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
 </html>
-
-<?php phpinfo();

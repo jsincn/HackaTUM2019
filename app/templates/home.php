@@ -11,22 +11,26 @@
 </head>
 
 <body>
-<?php require "components/navbar.php"; ?>
+    <?php require "components/navbar.php"; ?>
     <div class="contact-clean" style="align:center">
         <div class="card" style="margin: auto">
             <div class="card-body">
                 <h2 class="text-center">Canteen Payment</h2>
-                <h4> Payment confirmed </h4>
-                <h5><small>Logged in as <?php echo $data['studentName'] ?>.</small></h5>
-                <h3>Your remaining balance is <?php echo $data['balance']; ?>€. </h3>
-                <br>
-                <button type="button" class="btn btn-danger">Call a staff member</button>
+                <h3>How it works:
+                <ol>
+                    <li>Get your food</li>
+                    <li>Find a table</li>
+                    <li>Scan the qr code on the table</li>
+                    <li>Place your student card on your tray with the barcode facing up</li>
+                    <li>Take a photo of your tray</li>
+                    <li>Confirm your purchase</li>
+                    <li>Done</li>
+</ol>
 
             </div>
         </div>
     </div>
     <?php require "components/footer.php"; ?>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
