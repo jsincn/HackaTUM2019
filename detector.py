@@ -10,7 +10,12 @@ with open("C:/Users/Willi/images/Food/Pommes/pommes.jpg", mode="rb") as test_dat
     results = predictor.detect_image('0d5ff816-e2a8-4a81-bee7-cfcbe2293962', 'Iteration3', test_data)
 
 # Display the results.
-L = []
+Produkte = {}
 for prediction in results.predictions:
-    if (prediction.probability > 0.9 and not L.__contains__(prediction.tag_name)):
-        L.append(prediction.tag_name)
+    if (prediction.probability > 0.9 ):
+      if (prediction.tag_name in Produkte):
+          Produkte[prediction.tag_name]+=1
+      else:
+          Produkte[prediction.tag_name]=1
+
+print(Produkte)
