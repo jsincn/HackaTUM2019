@@ -20,17 +20,19 @@
             <div class="card-body">
                 <h2 class="text-center">Gastro Payment</h2>
                 <h3>How it works:
+                <div class="container">
                 <div class="row">
-                    <div class="column">
+                    <div class="col">
                         <img src="/assets/img/1.png">
                         <img src="/assets/img/2.png">
                         <img src="/assets/img/3.png">
                     </div>
-                    <div class="column">  
+                    <div class="col">  
                         <img src="/assets/img/4.png">
                         <img src="/assets/img/5.png">
                         <img src="/assets/img/6.png">
                     </div>
+                </div>
                 </div>
 
             </div>
