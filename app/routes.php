@@ -189,7 +189,8 @@ return function (App $app) {
         $log->notice($status, $out);
         // $log->notice($out);
         $data['recognized'] = json_decode($objects[0], true);
-        $data['user'] = $objects[1];
+        $data['user'] = str_replace("b'", "", $objects[1]);
+        $data['user'] = str_replace("'", "", $data['user']);
         $log->notice($data['user']);
         $log->notice(1, $data['recognized']);
         $log->notice("Entering Payment Gateway");
@@ -208,13 +209,7 @@ return function (App $app) {
         $data['products'] = array();
         $log->notice("Data Received", $postVar);
         $db = $this->get('db');
-        // $sampleData = array
-        // (
-        //     array("Fries", 1, 1.7),
-        //     array("Coca Cola Classic 0.5L", 1, 1.3),
-        //     array("Deposit", 1, 0.25),
-        //     array("Currywurst", 1, 3.5)
-        // );
+
         $query = "SELECT * FROM product;";
         $getResults=sqlsrv_query($db, $query);
 
@@ -223,40 +218,33 @@ return function (App $app) {
         }
         $productCount = 0;
 
-        while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
-            $log->info("Product", $row);
-            $data['products'][$productCount][0] = $row['product_id'];
-            $data['products'][$productCount][1] = $row['name'];
-            $data['products'][$productCount][2] = $row['type'];
-            $data['products'][$productCount][3] = $row['price'];
-            $data['products'][$productCount][4] = $row['pfand'];
-            $productCount++;
-        }
-            
-        sqlsrv_free_stmt($getResults);
-        sqlsrv_close($db);
         $data['soldItems'] = array();
         $i=0;
         foreach ($postVar as $key => $quantity) {
             if ($key != "id") {
                 $data['soldItems'][$i] = array($key, $quantity, 0, null);
+                $i++;
             }
         }
 
-        $data['studentID'] = $postVar['id'];
-        $log->notice("Products", $data['products']);
-        foreach ($data['products'] as $product) {
+        while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
             for ($i = 0; $i < count($data['soldItems']); $i++) {
-                $data['soldItems'][$i][0] = str_replace("P", "", $data['soldItems'][$i][0]);
-                $log->notice($data['soldItems'][$i][0]);
-                $log->notice($product[0]);
-                if ($data['soldItems'][$i][0] == (string) $product[0]) {
-                    $data['soldItems'][$i][3] = $product[1];
-                    $data['soldItems'][$i][2] = $product[3];
-                break;
+                if (str_replace("P", "", $data['soldItems'][$i][0]) == (string) $row['product_id']) {
+                    $data['soldItems'][$i][3] = $row['name'];
+                    $data['soldItems'][$i][2] = $row['price'];
                 }
             }
         }
+
+        
+        $log->notice("none", $data['products']);
+        sqlsrv_free_stmt($getResults);
+        sqlsrv_close($db);
+
+
+        $data['studentID'] = $postVar['id'];
+        $log->notice("Products", $data['products']);
+        
         $data['studentName'] = $postVar['id'];
         $data['total'] = 0;
         foreach ($data['soldItems'] as $item) {
@@ -286,7 +274,7 @@ return function (App $app) {
         return $renderer->render($response, "previousTransactions.php", $data);
     });
 
-    $app->post('/paymentConfirmed', function (Request $request, Response $response, $args) {
+    $app->get('/paymentConfirmed', function (Request $request, Response $response) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Payment confirmed");
@@ -295,15 +283,27 @@ return function (App $app) {
         $db = $this->get('db');
         
         $data = array();
-        $data['studentID'] = $postVar['studentID'];
-        $data['total'] = $postVar['total'];
+        $data['studentID'] = $_GET['studentID'];
+        
+            $total = $_GET['total'];
         $query = "SELECT balance FROM student_card WHERE card_id=" . $data['studentID'] . ";";
         $getResults=sqlsrv_query($db, $query);
 
+        $newBalance = 0;
         if (!$getResults == false) {
-            $balance = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)[0];
-            $newBalance =  $balance - $total;
-            $data['balance'] = $newBalance;
+            try {
+                
+                $balance = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC);
+                if (isset($balance[0])) {
+                    $newBalance =  $balance - $total;
+                    $data['balance'] = $newBalance;
+                } else {
+                    $newBalance =  mt_rand(0, 20);
+                    $data['balance'] = $newBalance;
+                }
+            } catch (Exception $e) {
+                $log->notice($e);
+            }
 
         }
 

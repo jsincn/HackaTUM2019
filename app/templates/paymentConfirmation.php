@@ -39,11 +39,23 @@
                     </tr>
                 </tfoot>
             </table>
+            <?php if ($data['studentID'] == "04200655300.") {
+                        echo '<div class="alert alert-danger" role="alert">
+                        Careful! One or more products you selected may contain traces of peanuts, which you are alergic to.
+                      </div>';
+                    };
+                    ?>
+            <?php if ($data['studentID'] == "04200586721.") {
+                        echo '<div class="alert alert-danger" role="alert">
+                        Careful! One or more products you selected may contain traces of peanuts, which you are alergic to.
+                      </div>';
+                    };
+                    ?>
             <h4>Logged in as <?php echo $data['studentID'] ?>.</h4>
-            <form hidden id="hidden" action="/paymentConfirmed" method="POST">
-            <?php foreach ($data['soldItems'] as $item) {
-                        echo "<input type='text' name='total' value='" . $data['total'] . "' hidden>";
-                };
+            <form hidden id="hidden" action="/paymentConfirmed" method="GET">
+            <?php
+                echo "<input type='text' name='total' value='" . $data['total'] . "' hidden>";
+                
                 echo "<input type='text' name='studentID' value='" . $data['studentID'] . "' hidden>";
             ?>
             </form>
