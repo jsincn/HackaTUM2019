@@ -24,13 +24,31 @@
                 <div class="row">
                     <div class="col">
                         <img src="/assets/img/1.png">
-                        <img src="/assets/img/2.png">
-                        <img src="/assets/img/3.png">
+
                     </div>
-                    <div class="col">  
-                        <img src="/assets/img/4.png">
+                    <div class="col"> 
+                    <img src="/assets/img/2.png">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <img src="/assets/img/3.png">
+
+                    </div>
+                    <div class="col"> 
+                    <img src="/assets/img/4.png">
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
                         <img src="/assets/img/5.png">
-                        <img src="/assets/img/6.png">
+
+                    </div>
+                    <div class="col"> 
+                    <img src="/assets/img/6.png">
+
                     </div>
                 </div>
                 </div>
