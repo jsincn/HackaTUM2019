@@ -17,7 +17,7 @@
 
         <form>
             <h2 class="text-center">Canteen Payment Administration</h2>
-            <h4>Verify a given meal</h4>
+            <h4>Meal details</h4>
             
             <div class="form-group mb-2">
                 <label for="staticEmail2">Meal ID</label>
