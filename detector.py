@@ -1,4 +1,4 @@
-from __future__ import print_function
+#from __future__ import print_function
 from azure.cognitiveservices.vision.customvision.prediction import CustomVisionPredictionClient
 import pyzbar.pyzbar as pyzbar
 import numpy as np
@@ -12,9 +12,7 @@ def decode(im):
     # Print results
     Barcode = ""
     for obj in decodedObjects:
-
         Barcode=(obj.data)
-
     return Barcode
 # Now there is a trained endpoint that can be used to make a prediction
 
@@ -23,8 +21,7 @@ predictor = CustomVisionPredictionClient('7f4972bf8efe41db88c2e5c741d9309f',
 
 # Open the sample image and get back the prediction results.
 with open('C:/Users/Willi/Desktop/Food/test.jpg', mode="rb") as test_data:
-    try:
-        results = predictor.detect_image('0d5ff816-e2a8-4a81-bee7-cfcbe2293962', 'Iteration20', test_data)
+    results = predictor.detect_image('0d5ff816-e2a8-4a81-bee7-cfcbe2293962', 'Iteration20', test_data)
 
 # Display the results.
 Produkte = {}
