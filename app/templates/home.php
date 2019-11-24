@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Canteen Pay</title>
+    <title>Gastro Pay</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="/assets/css/styles.min.css">
@@ -18,17 +18,20 @@
         <div class="col-md-3"></div>
         <div class="card" style="margin: auto">
             <div class="card-body">
-                <h2 class="text-center">Canteen Payment</h2>
+                <h2 class="text-center">Gastro Payment</h2>
                 <h3>How it works:
-                <ol>
-                    <li>Get your food</li>
-                    <li>Find a table</li>
-                    <li>Scan the qr code on the table</li>
-                    <li>Place your student card on your tray with the barcode facing up</li>
-                    <li>Take a photo of your tray</li>
-                    <li>Confirm your purchase</li>
-                    <li>Done</li>
-</ol>
+                <div class="row">
+                    <div class="column">
+                        <img src="/assets/img/1.png">
+                        <img src="/assets/img/2.png">
+                        <img src="/assets/img/3.png">
+                    </div>
+                    <div class="column">  
+                        <img src="/assets/img/4.png">
+                        <img src="/assets/img/5.png">
+                        <img src="/assets/img/6.png">
+                    </div>
+                </div>
 
             </div>
         </div>
