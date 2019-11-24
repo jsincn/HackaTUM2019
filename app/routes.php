@@ -172,26 +172,20 @@ return function (App $app) {
 
         
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
-
             $filename = moveUploadedFile($directory, $uploadedFile);
             $log->info("File Uploaded " . $filename);
-            $command = 'python3 /var/www/hackatum2019/python/getImageData.py ' . $filename;
+            $command = "/usr/bin/python3 /var/www/hackatum2019/python/getImageData.py " . $filename;
             $log->notice($command);
-            system($command);
-            sleep( 5 );
-            $myfile = fopen("/var/www/hackatum2019/python/temp.txt", "r") or die("Unable to open file!");
-            $string = fread($myfile,filesize("/var/www/hackatum2019/python/temp.txt"));
-            fclose($myfile);
+            exec($command, $out, $status);
         }
-        $log->notice($string);
-        $objects = explode("|", $string);
-        $log->notice($status);
-        
+        $objects = explode("|", $out[0]);
+        $log->notice($status, $out);
+        // $log->notice($out);
         $data['recognized'] = json_decode($objects[0], true);
         $data['user'] = $objects[1];
-        //$log->notice($data['user']);
-        //$log->notice(1, $data['recognized']);
-        //$log->notice("Entering Payment Gateway");
+        $log->notice($data['user']);
+        $log->notice(1, $data['recognized']);
+        $log->notice("Entering Payment Gateway");
         return $renderer->render($response, "paymentGateway.php", $data);
     });
 
@@ -203,7 +197,10 @@ return function (App $app) {
         $postVar = $request->getParsedBody();
         foreach ($postVar as $key => $param) {
         }
+        $data = array();
+        $data['products'] = array();
         $log->notice("Data Received", $postVar);
+        $db = $this->get('db');
         // $sampleData = array
         // (
         //     array("Fries", 1, 1.7),
@@ -211,58 +208,46 @@ return function (App $app) {
         //     array("Deposit", 1, 0.25),
         //     array("Currywurst", 1, 3.5)
         // );
+        $query = "SELECT * FROM product;";
+        $getResults=sqlsrv_query($db, $query);
 
-        $data = array();
-        $data['transactions'] = array();
-        if (isset($args['table_id']) || isset($_GET['table_id'])) {
-            $db = $this->get('db');
-            if (isset($_GET['table_id'])) {
-                $table_id = $_GET['table_id'];
-            } else {
-                $table_id =$args['table_id'];
-            }
-            $query = "
-            BEGIN TRANSACTION
-             DECLARE @DataID int;
-             DECLARE @total money;
-             DECLARE @card_id numeric(18,0) = 04200586721;
-             DECLARE @table_id int = 2;
-            
-               INSERT INTO meal (card_id, table_id) VALUES (@card_id, @table_id);
-               SELECT @DataID = @@IDENTITY;
-               INSERT INTO consists_of (meal_id, product_id, amount) VALUES (@DataID, 1, 3);
-               INSERT INTO consists_of (meal_id, product_id, amount) VALUES (@DataID, 3, 2);
-               INSERT INTO consists_of (meal_id, product_id, amount) VALUES (@DataID, 2, 1);
-               INSERT INTO consists_of (meal_id, product_id, amount) VALUES (@DataID, 4, 1);
-               SELECT @total = (SELECT sum((coalesce(p.price+p.pfand, p.price, p.pfand)) * c.amount) 
-                                FROM consists_of c, product p
-                                WHERE c.meal_id=@DataID AND c.product_id=p.product_id);
-               UPDATE meal SET total = @total WHERE meal_id = @DataID; 
-
-               IF (select balance from student_card where card_id=@card_id)-@total>= 0
-                   BEGIN
-                   UPDATE student_card
-                   SET balance = balance - @total
-                   WHERE card_id=@card_id;
-                   COMMIT
-                   END
-                ELSE
-                    
-                    ROLLBACK TRANSACTION;
-            
-            ";
-            $getResults=sqlsrv_query($db, $query);
-            
-            sqlsrv_free_stmt($getResults);
-            sqlsrv_close($db);
+        if ($getResults == false) {
+            echo(sqlsrv_errors());
         }
-        
-        $data = array();
+        $productCount = 0;
+
+        while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
+            $log->info("Product", $row);
+            $data['products'][$productCount][0] = $row['product_id'];
+            $data['products'][$productCount][1] = $row['name'];
+            $data['products'][$productCount][2] = $row['type'];
+            $data['products'][$productCount][3] = $row['price'];
+            $data['products'][$productCount][4] = $row['pfand'];
+            $productCount++;
+        }
+            
+        sqlsrv_free_stmt($getResults);
+        sqlsrv_close($db);
         $data['soldItems'] = array();
         $i=0;
         foreach ($postVar as $key => $quantity) {
             if ($key != "id") {
-                $data['soldItems'][$i] = array($key, $quantity, 10);
+                $data['soldItems'][$i] = array($key, $quantity, 0, null);
+            }
+        }
+
+        $data['studentID'] = $postVar['id'];
+        $log->notice("Products", $data['products']);
+        foreach ($data['products'] as $product) {
+            for ($i = 0; $i < count($data['soldItems']); $i++) {
+                $data['soldItems'][$i][0] = str_replace("P", "", $data['soldItems'][$i][0]);
+                $log->notice($data['soldItems'][$i][0]);
+                $log->notice($product[0]);
+                if ($data['soldItems'][$i][0] == (string) $product[0]) {
+                    $data['soldItems'][$i][3] = $product[1];
+                    $data['soldItems'][$i][2] = $product[3];
+                break;
+                }
             }
         }
         $data['studentName'] = $postVar['id'];
@@ -294,14 +279,35 @@ return function (App $app) {
         return $renderer->render($response, "previousTransactions.php", $data);
     });
 
-    $app->get('/paymentConfirmed', function (Request $request, Response $response, $args) {
+    $app->post('/paymentConfirmed', function (Request $request, Response $response, $args) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Payment confirmed");
 
+
+        $db = $this->get('db');
+        
         $data = array();
+        $data['studentID'] = $postVar['studentID'];
+        $data['total'] = $postVar['total'];
+        $query = "SELECT balance FROM student_card WHERE card_id=" . $data['studentID'] . ";";
+        $getResults=sqlsrv_query($db, $query);
+
+        if (!$getResults == false) {
+            $balance = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)[0];
+            $newBalance =  $balance - $total;
+            $data['balance'] = $newBalance;
+
+        }
+
+        $query = "UPDATE student_card SET balance=" . $newBalance . "  WHERE card_id=" . $data['studentID'] . ";";
+
+            
+        sqlsrv_free_stmt($getResults);
+        sqlsrv_close($db);
+
         $data['studentName'] = "Robert Smith";
-        $data['balance'] = 15;
+    
 
         return $renderer->render($response, "paymentConfirmed.php", $data);
     });
