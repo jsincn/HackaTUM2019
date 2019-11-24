@@ -11,6 +11,6 @@
                 <li class="list-inline-item"><a href="#">Report Abuse</a></li>
                 <li class="list-inline-item"></li>
             </ul>
-            <p class="copyright">Jakob Steimle, William Huelle, Marcel Prepens © 2019</p>
+            <p class="copyright">Jakob Steimle, William Huelle, Marcel Prepens, Julian Sikora © 2019</p>
         </footer>
     </div>

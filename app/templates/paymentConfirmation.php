@@ -27,7 +27,7 @@
                 </thead>
                 <tbody>
                     <?php foreach ($data['soldItems'] as $item) {
-                        echo "<tr><th scope='row'>" . $item[0] . "</th><td>" . $item[1] . "</td><td>" . $item[2] . "€</td></tr>";
+                        echo "<tr><th scope='row'>" . $item[3] . "</th><td>" . $item[1] . "</td><td>" . $item[2] . "€</td></tr>";
                     };
                     ?>
                 </tbody>
@@ -39,8 +39,16 @@
                     </tr>
                 </tfoot>
             </table>
-            <h4>Logged in as <?php echo $data['studentName'] ?>.</h4>
-            <div><button type="button" class="btn btn-lg btn-success">Confirm</button> <button type="button" class="btn btn-lg btn-primary">Retake Photo</button></div>
+            <h4>Logged in as <?php echo $data['studentID'] ?>.</h4>
+            <form hidden id="hidden" action="/paymentConfirmed" method="POST">
+            <?php foreach ($data['soldItems'] as $item) {
+                        echo "<input type='text' name='total' value='" . $data['total'] . "' hidden>";
+                };
+                echo "<input type='text' name='studentID' value='" . $data['studentID'] . "' hidden>";
+            ?>
+            </form>
+            <div><button  type="submit" onClick="$('#hidden').submit()" class="btn btn-lg btn-success" for="hidden">Confirm</button> <button type="button" class="btn btn-lg btn-primary" onClick="window.history.go(-2)">Retake Photo</button></div>
+            
             <br>
                 <button type="button" class="btn btn-danger">Call a staff member</button>
 

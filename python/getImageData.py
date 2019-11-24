@@ -23,7 +23,7 @@ predictor = CustomVisionPredictionClient('7f4972bf8efe41db88c2e5c741d9309f',
 
 # Open the sample image and get back the prediction results.
 with open("../user_files/" + sys.argv[1], mode="rb") as test_data:
-    results = predictor.detect_image('0d5ff816-e2a8-4a81-bee7-cfcbe2293962', 'Iteration14', test_data)
+    results = predictor.detect_image('0d5ff816-e2a8-4a81-bee7-cfcbe2293962', 'Iteration20', test_data)
 
 # Display the results.
 Barcode = -1;

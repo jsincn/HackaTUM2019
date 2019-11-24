@@ -12,8 +12,6 @@ use Monolog\Handler\FirePHPHandler;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
-
-
 function moveUploadedFile($directory, $uploadedFile)
 {
     $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
@@ -27,22 +25,23 @@ function moveUploadedFile($directory, $uploadedFile)
 
 
 return function (App $app) {
-
     $container = $app->getContainer();
 
     $container->set(
-        'db', function() {
+        'db',
+        function () {
             
         // SQL Server Extension Sample Code:
-        $connectionInfo = array("UID" => "jsteimle", "pwd" => '5Pb14%lVAzMU714$iOKi', "Database" => "cantine", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
-        $serverName = "tcp:hackatum2019-jakob.database.windows.net,1433";
-        $conn = sqlsrv_connect($serverName, $connectionInfo);
+            $connectionInfo = array("UID" => "jsteimle", "pwd" => '5Pb14%lVAzMU714$iOKi', "Database" => "cantine", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
+            $serverName = "tcp:hackatum2019-jakob.database.windows.net,1433";
+            $conn = sqlsrv_connect($serverName, $connectionInfo);
             return $conn;
         }
     );
 
     $container->set(
-        'logger', function() {
+        'logger',
+        function () {
             $log = new Logger('debug');
             $firephp = new FirePHPHandler();
             $stream = new StreamHandler(__DIR__ .'/../logs/debug.log', Logger::DEBUG);
@@ -93,7 +92,7 @@ return function (App $app) {
             if ($getResults == false) {
                 echo(sqlsrv_errors());
             }
-            $productCount = 0;  
+            $productCount = 0;
             while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
                 $log->notice(1, $row);
                 $data['transactions'][$productCount][0] = $row['meal_id'];
@@ -101,12 +100,11 @@ return function (App $app) {
                 $data['transactions'][$productCount][2] = $row['timestamp'];
                 $data['transactions'][$productCount][3] = $row['table_id'];
                 $data['transactions'][$productCount][4] = $row['total'];
-                echo("<br/>");  
-                $productCount++;  
+                echo("<br/>");
+                $productCount++;
             }
-            sqlsrv_free_stmt($getResults);  
-            sqlsrv_close($db); 
-            
+            sqlsrv_free_stmt($getResults);
+            sqlsrv_close($db);
         }
         
         return $renderer->render($response, "admin/checkTable.php", $data);
@@ -130,7 +128,7 @@ return function (App $app) {
             if ($getResults == false) {
                 echo(sqlsrv_errors());
             }
-            $productCount = 0;  
+            $productCount = 0;
             while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
                 $log->notice(2, $row);
                 $data['transactions'][$productCount][0] = $row['meal_id'];
@@ -138,11 +136,10 @@ return function (App $app) {
                 $data['transactions'][$productCount][2] = $row['product_id'];
                 $data['transactions'][$productCount][3] = $row['amount'];
                 
-                $productCount++;  
+                $productCount++;
             }
-            sqlsrv_free_stmt($getResults);  
-            sqlsrv_close($db); 
-            
+            sqlsrv_free_stmt($getResults);
+            sqlsrv_close($db);
         }
 
 
@@ -161,8 +158,6 @@ return function (App $app) {
     });
     
     $app->post('/paymentGateway', function (Request $request, Response $response) {
-        
-
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
 
@@ -178,8 +173,8 @@ return function (App $app) {
         
         if ($uploadedFile->getError() === UPLOAD_ERR_OK) {
             $filename = moveUploadedFile($directory, $uploadedFile);
-            $log->warning("File Uploaded " . $filename);
-            $command = 'python ' . __DIR__ . '/../python/getImageData.py ' . $filename;
+            $log->info("File Uploaded " . $filename);
+            $command = "/usr/bin/python3 /var/www/hackatum2019/python/getImageData.py " . $filename;
             $log->notice($command);
             exec($command, $out, $status);
         }
@@ -202,7 +197,10 @@ return function (App $app) {
         $postVar = $request->getParsedBody();
         foreach ($postVar as $key => $param) {
         }
+        $data = array();
+        $data['products'] = array();
         $log->notice("Data Received", $postVar);
+        $db = $this->get('db');
         // $sampleData = array
         // (
         //     array("Fries", 1, 1.7),
@@ -210,14 +208,46 @@ return function (App $app) {
         //     array("Deposit", 1, 0.25),
         //     array("Currywurst", 1, 3.5)
         // );
+        $query = "SELECT * FROM product;";
+        $getResults=sqlsrv_query($db, $query);
 
-        
-        $data = array();
+        if ($getResults == false) {
+            echo(sqlsrv_errors());
+        }
+        $productCount = 0;
+
+        while ($row = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)) {
+            $log->info("Product", $row);
+            $data['products'][$productCount][0] = $row['product_id'];
+            $data['products'][$productCount][1] = $row['name'];
+            $data['products'][$productCount][2] = $row['type'];
+            $data['products'][$productCount][3] = $row['price'];
+            $data['products'][$productCount][4] = $row['pfand'];
+            $productCount++;
+        }
+            
+        sqlsrv_free_stmt($getResults);
+        sqlsrv_close($db);
         $data['soldItems'] = array();
         $i=0;
         foreach ($postVar as $key => $quantity) {
             if ($key != "id") {
-                $data['soldItems'][$i] = array($key, $quantity, 10);
+                $data['soldItems'][$i] = array($key, $quantity, 0, null);
+            }
+        }
+
+        $data['studentID'] = $postVar['id'];
+        $log->notice("Products", $data['products']);
+        foreach ($data['products'] as $product) {
+            for ($i = 0; $i < count($data['soldItems']); $i++) {
+                $data['soldItems'][$i][0] = str_replace("P", "", $data['soldItems'][$i][0]);
+                $log->notice($data['soldItems'][$i][0]);
+                $log->notice($product[0]);
+                if ($data['soldItems'][$i][0] == (string) $product[0]) {
+                    $data['soldItems'][$i][3] = $product[1];
+                    $data['soldItems'][$i][2] = $product[3];
+                break;
+                }
             }
         }
         $data['studentName'] = $postVar['id'];
@@ -232,8 +262,7 @@ return function (App $app) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Running payment confirmation");
-        $sampleData = array
-        (
+        $sampleData = array(
             array("03.11.2019", 8.3, "Mensa Garching"),
             array("04.11.2019", 7.3, "Studi-kaffee"),
             array("05.11.2019", 4.9, "Mensa Garching"),
@@ -250,18 +279,36 @@ return function (App $app) {
         return $renderer->render($response, "previousTransactions.php", $data);
     });
 
-    $app->get('/paymentConfirmed', function (Request $request, Response $response, $args) {
+    $app->post('/paymentConfirmed', function (Request $request, Response $response, $args) {
         $renderer = $this->get('renderer');
         $log = $this->get('logger');
         $log->notice("Payment confirmed");
 
+
+        $db = $this->get('db');
+        
         $data = array();
+        $data['studentID'] = $postVar['studentID'];
+        $data['total'] = $postVar['total'];
+        $query = "SELECT balance FROM student_card WHERE card_id=" . $data['studentID'] . ";";
+        $getResults=sqlsrv_query($db, $query);
+
+        if (!$getResults == false) {
+            $balance = sqlsrv_fetch_array($getResults, SQLSRV_FETCH_ASSOC)[0];
+            $newBalance =  $balance - $total;
+            $data['balance'] = $newBalance;
+
+        }
+
+        $query = "UPDATE student_card SET balance=" . $newBalance . "  WHERE card_id=" . $data['studentID'] . ";";
+
+            
+        sqlsrv_free_stmt($getResults);
+        sqlsrv_close($db);
+
         $data['studentName'] = "Robert Smith";
-        $data['balance'] = 15;
+    
 
         return $renderer->render($response, "paymentConfirmed.php", $data);
     });
-
 };
-
-
