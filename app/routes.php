@@ -156,6 +156,13 @@ return function (App $app) {
         );
         return $renderer->render($response, "payment.php", $templateData);
     });
+
+    $app->get('/login', function (Request $request, Response $response, $args) {
+        $renderer = $this->get('renderer');
+        $log = $this->get('logger');
+        $log->notice("Login");
+        return $renderer->render($response, "login.php");
+    });
     
     $app->post('/paymentGateway', function (Request $request, Response $response) {
         $renderer = $this->get('renderer');
